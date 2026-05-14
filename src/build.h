@@ -1,0 +1,5 @@
+#define VERSION "4.0.4"
+#define COMPILER "clang"
+#define ID "unknown"
+#define BUILD "unknown"
+#define DIR "unknown"

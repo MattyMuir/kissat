@@ -7,8 +7,123 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifdef _WIN32
+#include <io.h>
+#define W_OK 2
+#define R_OK 4
+#define S_ISDIR(m) (((m) & _S_IFDIR) != 0)
+#else
 #include <unistd.h>
+#endif
 
+#ifdef _WIN32
+static const char* last_sep(const char* path)
+{
+    const char* a = strrchr(path, '/');
+    const char* b = strrchr(path, '\\');
+    if (!a) return b;
+    if (!b) return a;
+    return (a > b) ? a : b;
+}
+
+bool kissat_file_exists(const char* path)
+{
+    if (!path)
+        return false;
+    struct _stat buf;
+    if (_stat(path, &buf))
+        return false;
+    return true;
+}
+
+bool kissat_file_readable(const char* path)
+{
+    if (!path)
+        return false;
+    struct _stat buf;
+    if (_stat(path, &buf))
+        return false;
+    if (_access(path, R_OK))
+        return false;
+    return true;
+}
+
+bool kissat_file_writable(const char* path)
+{
+    int res;
+    if (!path)
+        res = 1;
+    else if (!strcmp(path, "NUL") || !strcmp(path, "/dev/null"))
+        res = 0;
+    else
+    {
+        if (!*path)
+            res = 2;
+        else
+        {
+            struct _stat buf;
+            const char* p = last_sep(path);
+            if (!p)
+            {
+                if (_stat(path, &buf))
+                {
+                    if (errno == ENOENT)
+                        res = 0;
+                    else
+                        res = -2;
+                }
+                else if (S_ISDIR(buf.st_mode))
+                    res = 3;
+                else if (_access(path, W_OK))
+                    res = 4;
+                else
+                    res = 0;
+            }
+            else if (!p[1])
+                res = 5;
+            else
+            {
+                const size_t len = p - path;
+                char* dirname = malloc(len + 1);
+                if (dirname)
+                {
+                    strncpy(dirname, path, len);
+                    dirname[len] = 0;
+                    if (_stat(dirname, &buf))
+                        res = 6;
+                    else if (!S_ISDIR(buf.st_mode))
+                        res = 7;
+                    else if (_access(dirname, W_OK))
+                        res = 8;
+                    else if (_stat(path, &buf))
+                    {
+                        if (errno == ENOENT)
+                            res = 0;
+                        else
+                            res = -3;
+                    }
+                    else if (_access(path, W_OK))
+                        res = 9;
+                    else
+                        res = 0;
+                    free(dirname);
+                }
+                else
+                    res = 10;
+            }
+        }
+    }
+    return !res;
+}
+
+size_t kissat_file_size(const char* path)
+{
+    struct _stat buf;
+    if (_stat(path, &buf))
+        return 0;
+    return (size_t)buf.st_size;
+}
+#else
 bool kissat_file_exists (const char *path) {
   if (!path)
     return false;
@@ -91,6 +206,7 @@ size_t kissat_file_size (const char *path) {
     return 0;
   return (size_t) buf.st_size;
 }
+#endif
 
 bool kissat_find_executable (const char *name) {
   const size_t name_len = strlen (name);

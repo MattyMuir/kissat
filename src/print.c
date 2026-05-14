@@ -2,7 +2,6 @@
 
 #include "print.h"
 #include "colors.h"
-#include "handle.h"
 #include "internal.h"
 
 #include <inttypes.h>
@@ -42,18 +41,6 @@ void kissat_warning (kissat *solver, const char *fmt, ...) {
 #ifdef NOPTIONS
   (void) solver;
 #endif
-}
-
-void kissat_signal (kissat *solver, const char *type, int sig) {
-  if (verbosity (solver) < 0)
-    return;
-  TERMINAL (stdout, 1);
-  fputs (solver->prefix, stdout);
-  COLOR (BOLD RED);
-  printf ("%s signal %d (%s)", type, sig, kissat_signal_name (sig));
-  COLOR (NORMAL);
-  fputc ('\n', stdout);
-  fflush (stdout);
 }
 
 static void print_message (kissat *solver, const char *color,

@@ -17,21 +17,21 @@ typedef struct binary_tagged_reference large_watch;
 
 struct binary_tagged_literal {
 #ifdef KISSAT_IS_BIG_ENDIAN
-  bool binary : 1;
+  unsigned binary : 1;
   unsigned lit : 31;
 #else
   unsigned lit : 31;
-  bool binary : 1;
+  unsigned binary : 1;
 #endif
 };
 
 struct binary_tagged_reference {
 #ifdef KISSAT_IS_BIG_ENDIAN
-  bool binary : 1;
+  unsigned binary : 1;
   unsigned ref : 31;
 #else
   unsigned ref : 31;
-  bool binary : 1;
+  unsigned binary : 1;
 #endif
 };
 

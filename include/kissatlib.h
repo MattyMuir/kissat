@@ -1,3 +1,2 @@
 #pragma once
-
-int Square(int x);
+#include "../src/KissatSolver.h"

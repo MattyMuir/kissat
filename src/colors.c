@@ -1,13 +1,11 @@
 #include "colors.h"
 
-#include <unistd.h>
-
 int kissat_is_terminal[3] = {0, -1, -1};
 
 int kissat_initialize_terminal (int fd) {
   assert (fd == 1 || fd == 2);
   assert (kissat_is_terminal[fd] < 0);
-  return kissat_is_terminal[fd] = isatty (fd);
+  return kissat_is_terminal[fd] = true;
 }
 
 void kissat_force_colors (void) {

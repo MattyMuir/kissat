@@ -18,12 +18,9 @@ readability-*,
 -readability-math-missing-parentheses,
 -readability-static-accessed-through-instance,
 -readability-redundant-access-specifiers,
--readability-avoid-nested-conditional-operator
+-readability-avoid-nested-conditional-operator,
+-readability-function-cognitive-complexity
 '
-
-CheckOptions:
- - key:    readability-function-cognitive-complexity.Threshold
-   value:  35
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '\".*\"'
